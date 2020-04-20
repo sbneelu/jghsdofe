@@ -1,0 +1,54 @@
+html, body, .container {
+  height: 100%;
+  padding: 0;
+}
+
+.section {
+  font-size: 2em;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.section a {
+  color: white;
+}
+
+.bronze {
+  background-color: #800000;
+  color: white;
+}
+
+.bronze:hover, .bronze:active {
+  color: white;
+}
+
+.silver {
+  background-color: #808080;
+  color: white;
+}
+
+.silver:hover, .silver:active {
+  color: white;
+}
+
+.gold {
+  background-color: #ffd700;
+  color: black;
+}
+
+.gold:hover, .gold:active {
+  color: black;
+}
+
+.logos {
+  text-align: center;
+  height: 25%;
+}
+
+.logos img {
+  height: 100%;
+}
+
+.level {
+  padding: 15px;
+}

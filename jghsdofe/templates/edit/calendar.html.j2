@@ -1,0 +1,174 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('view.summary', level=level) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8">
+      <h1 class="text-center">Calendar</h1>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+  <div id='calendar'></div>
+{% endblock content %}
+
+{% block head %}
+  <link href="{{ url_for('static', filename='fullcalendar/core/main.css') }}" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='fullcalendar/daygrid/main.css') }}" rel="stylesheet" />
+
+  <script src="{{ url_for('static', filename='fullcalendar/core/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='fullcalendar/daygrid/main.js') }}"></script>
+
+  <script>
+    var listOfMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var listOfDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      var events = {{ events }};
+
+      var calendarEl = document.getElementById('calendar');
+
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid'],
+        header: {
+          left:   'dayGridMonth,dayGridWeek',
+          center: 'title',
+          right:  'today prev,next'
+        },
+        eventLimit: true,
+        events: events,
+        eventClick: function(info) {
+          document.getElementById('event-title').innerHTML = '';
+          document.getElementById('event-times').innerHTML = '';
+          document.getElementById('event-location').innerHTML = '';
+          document.getElementById('event-description').innerHTML = '';
+          document.getElementById('event-description').innerHTML = '';
+          document.getElementById('event-title').innerHTML = info.event.title;
+
+          var start_date = info.event.start;
+          var end_date = info.event.end;
+          if (end_date == null) {
+            document.getElementById('event-times').innerHTML = '<div><b>Date:</b> ' + listOfDays[start_date.getDay()] + ' ' + start_date.getDate().toString() + ' ' + listOfMonths[start_date.getMonth()] + ' ' + start_date.getFullYear().toString() + '</div>';
+            var hr = start_date.getHours().toString();
+            var mn = start_date.getMinutes().toString();
+
+            if (hr.length == 1) {
+              hr = '0' + hr;
+            }
+            if (mn.length == 1) {
+              mn = '0' + mn;
+            }
+
+            document.getElementById('event-times').innerHTML += '<div><b>Time:</b> ' + hr + ':' + mn + '</div>';
+          }
+
+          else {
+            if (start_date.getFullYear() == end_date.getFullYear() && start_date.getMonth() == end_date.getMonth() && start_date.getDate() == end_date.getDate()) {
+              document.getElementById('event-times').innerHTML = '<div><b>Date:</b> ' + listOfDays[start_date.getDay()] + ' ' + start_date.getDate().toString() + ' ' + listOfMonths[start_date.getMonth()] + ' ' + start_date.getFullYear().toString() + '</div>';
+              var hr = start_date.getHours().toString();
+              var mn = start_date.getMinutes().toString();
+
+              if (hr.length == 1) {
+                hr = '0' + hr;
+              }
+              if (mn.length == 1) {
+                mn = '0' + mn;
+              }
+
+              document.getElementById('event-times').innerHTML += '<div><b>Start Time:</b> ' + hr + ':' + mn + '</div>';
+
+              var hr = end_date.getHours().toString();
+              var mn = end_date.getMinutes().toString();
+
+              if (hr.length == 1) {
+                hr = '0' + hr;
+              }
+              if (mn.length == 1) {
+                mn = '0' + mn;
+              }
+
+              document.getElementById('event-times').innerHTML += '<div><b>End Time:</b> ' + hr + ':' + mn + '</div>';
+            }
+
+            else {
+              document.getElementById('event-times').innerHTML = '<div><b>Start Date:</b> ' + listOfDays[start_date.getDay()] + ' ' + start_date.getDate().toString() + ' ' + listOfMonths[start_date.getMonth()] + ' ' + start_date.getFullYear().toString() + '</div>';
+              var hr = start_date.getHours().toString();
+              var mn = start_date.getMinutes().toString();
+
+              if (hr.length == 1) {
+                hr = '0' + hr;
+              }
+              if (mn.length == 1) {
+                mn = '0' + mn;
+              }
+
+              document.getElementById('event-times').innerHTML += '<div><b>Start Time:</b> ' + hr + ':' + mn + '</div>';
+
+              document.getElementById('event-times').innerHTML += '<br>';
+
+              document.getElementById('event-times').innerHTML += '<div><b>End Date:</b> ' + listOfDays[end_date.getDay()] + ' ' + end_date.getDate().toString() + ' ' + listOfMonths[end_date.getMonth()] + ' ' + end_date.getFullYear().toString() + '</div>';
+
+              hr = end_date.getHours().toString();
+              mn = end_date.getMinutes().toString();
+
+              if (hr.length == 1) {
+                hr = '0' + hr;
+              }
+              if (mn.length == 1) {
+                mn = '0' + mn;
+              }
+              document.getElementById('event-times').innerHTML += '<div><b>End Time:</b> ' + hr + ':' + mn + '</div>';
+            }
+
+
+          }
+
+
+          if (info.event.extendedProps.location) {
+            document.getElementById('event-location').innerHTML = '<hr class="hr-colored"><div><b>Location:</b> ' + info.event.extendedProps.location + '</div>' ;
+          }
+
+          if (info.event.extendedProps.description) {
+            document.getElementById('event-description').innerHTML = '<hr class="hr-colored"><div><b>Description:</b> ' + info.event.extendedProps.description + '</div>' ;
+          }
+
+          document.getElementById('medium-window').className = '';
+
+          document.getElementById('medium-window').focus();
+        }
+      });
+
+      calendar.render();
+    });
+  </script>
+{% endblock head %}
+
+{% block body %}
+  <div id="medium-window" class="hidden">
+    <div id="medium-window-headbar"><a href="#" onclick="closeMediumWindow();">Close</a></div>
+    <div id="medium-window-body">
+      <h3 class="text-center" id="event-title"></h3>
+      <div class="text-center">
+        <a href="#" class="btn btn-primary">Edit</a>
+      </div>
+
+      <hr class="hr-colored">
+      <div id="event-times"></div>
+      <div id="event-location"></div>
+      <div id="event-description"></div>
+    </div>
+  </div>
+
+  <script>
+    function closeMediumWindow() {
+      document.getElementById('event-title').innerHTML = '';
+      document.getElementById('event-times').innerHTML = '';
+      document.getElementById('event-location').innerHTML = '';
+      document.getElementById('event-description').innerHTML = '';
+      document.getElementById('event-description').innerHTML = '';
+      document.getElementById('event-title').innerHTML = '';
+      document.getElementById('medium-window').className = 'hidden';
+    }
+
+  </script>
+{% endblock body %}

@@ -1,0 +1,193 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+
+{% set list_of_months = ['', 'January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] %}
+{% set list_of_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+
+<div class="row full-height">
+  <div class="col-sm-12 col-md-12 links-and-docs">
+    <a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary">Links and Documents</a>
+  </div>
+  <div class="col-sm-12 col-md-6 container announcements">
+    <div class="content-section">
+      <h2 class="text-center">Recent Announcements</h2>
+      <div>
+        {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+        <div class="row" style="width: 100%; margin:auto; margin-top: 1em; margin-bottom: 1.5em;">
+          <a href="{{ url_for('view.announcements', level=level) }}" class="btn btn-primary col-xs-12">Create/Edit Announcement</a>
+        </div>
+
+        {% if starred_announcements|length == 0 and unstarred_announcements|length == 0 %}
+          <div class="text-center">
+            No starred or recent announcements.
+          </div>
+          <br>
+        {% endif %}
+        {% for announcement in starred_announcements %}
+          <div class="announcement starred-announcement content-section">
+            <div class="starred"><span class="star">&#x2605;</span> Starred</div>
+            <p>{{ announcement.content }}</p>
+            <i>
+
+              {% set date_posted_hour = announcement.date_posted.hour|string if announcement.date_posted.hour > 10 else '0' + announcement.date_posted.hour|string %}
+              {% set date_posted_minute = announcement.date_posted.minute|string if announcement.date_posted.minute > 10 else '0' + announcement.date_posted.minute|string %}
+
+
+              {% if announcement.edited %}
+              {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
+              {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
+                Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
+                <br>
+                First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+              {% else %}
+                Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+              {% endif %}
+            </i>
+          </div>
+        {% endfor %}
+        {% for announcement in unstarred_announcements %}
+          <div class="announcement content-section">
+            <p>{{ announcement.content }}</p>
+            <i>
+
+              {% set date_posted_hour = announcement.date_posted.hour|string if announcement.date_posted.hour > 10 else '0' + announcement.date_posted.hour|string %}
+              {% set date_posted_minute = announcement.date_posted.minute|string if announcement.date_posted.minute > 10 else '0' + announcement.date_posted.minute|string %}
+
+              {% if announcement.edited %}
+              {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
+              {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
+                Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
+                <br>
+                First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+              {% else %}
+                Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+              {% endif %}
+            </i>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="text-right">
+        <a href="{{ url_for('view.announcements', level=level) }}">View older announcements...</a>
+      </div>
+
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-6 container events">
+    <div class="content-section">
+      <h2 class="text-center">Upcoming Events</h2>
+      <div>
+        {% if events|length == 0 %}
+          <div class="text-center">
+            No upcoming events in the next 7 days.
+          </div>
+          <br>
+        {% else %}
+          {% for event in events %}
+            <div class="event content-section">
+              <div class="text-center">
+                <b>{{ event.title }}</b>
+              </div>
+
+              <div>
+                {% if event.end %}
+                  {% if event.start.day == event.end.day and event.start.month == event.end.month and event.start.year == event.end.year %}
+                    <b>Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
+                    <br>
+                    {% set hr = event.start.hour|string %}
+                    {% set mn = event.start.minute|string %}
+                    {% if hr|length == 1 %}
+                      {% set hr = '0' + hr %}
+                    {% endif %}
+                    {% if mn|length == 1 %}
+                      {% set mn = '0' + mn %}
+                    {% endif %}
+                    <b>Start Time: </b> {{ hr }}:{{ mn }}
+                    <br>
+                    {% set hr = event.end.hour|string %}
+                    {% set mn = event.end.minute|string %}
+                    {% if hr|length == 1 %}
+                      {% set hr = '0' + hr %}
+                    {% endif %}
+                    {% if mn|length == 1 %}
+                      {% set mn = '0' + mn %}
+                    {% endif %}
+                    <b>End Time: </b> {{ hr }}:{{ mn }}
+
+                  {% else %}
+                    <b>Start Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
+                    <br>
+                    {% set hr = event.start.hour|string %}
+                    {% set mn = event.start.minute|string %}
+                    {% if hr|length == 1 %}
+                      {% set hr = '0' + hr %}
+                    {% endif %}
+                    {% if mn|length == 1 %}
+                      {% set mn = '0' + mn %}
+                    {% endif %}
+                    <b>Start Time: </b> {{ hr }}:{{ mn }}
+                    <br>
+                    <br>
+
+                    <b>End Date: </b> {{ list_of_days[event.end.weekday()] }} {{ event.end.day }} {{ list_of_months[event.end.month] }} {{ event.end.year }}
+                    <br>
+                    {% set hr = event.end.hour|string %}
+                    {% set mn = event.end.minute|string %}
+                    {% if hr|length == 1 %}
+                      {% set hr = '0' + hr %}
+                    {% endif %}
+                    {% if mn|length == 1 %}
+                      {% set mn = '0' + mn %}
+                    {% endif %}
+                    <b>End Time: </b> {{ hr }}:{{ mn }}
+
+                  {% endif %}
+
+
+                {% else %}
+                  <b>Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
+                  <br>
+                  {% set hr = event.start.hour|string %}
+                  {% set mn = event.start.minute|string %}
+                  {% if hr|length == 1 %}
+                    {% set hr = '0' + hr %}
+                  {% endif %}
+                  {% if mn|length == 1 %}
+                    {% set mn = '0' + mn %}
+                  {% endif %}
+                  <b>Time: </b> {{ hr }}:{{ mn }}
+
+
+                {% endif %}
+                <div>
+                  {% if event.location %}
+                    <br>
+                    <b>Location:</b> {{ event.location }}
+                  {% endif %}
+                </div>
+
+                <div>
+                  {% if event.description %}
+                    <br>
+                    <b>Description:</b> {{ event.description }}
+                  {% endif %}
+                </div>
+
+
+
+              </div>
+
+
+
+            </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div class="text-right">
+        <a href="{{ url_for('view.calendar', level=level) }}">View full calendar...</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock content %}

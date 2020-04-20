@@ -1,0 +1,52 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  <div class="logos">
+    <img src="{{ url_for('static', filename='assets/logos.png') }}" alt="JGHS and DofE Logos">
+  </div>
+  <div class="container m-2">
+    {% if current_user.is_authenticated %}
+      <div class="alert alert-info">Please email <a class="alert-link" href="mailto:neelu.rsa@gmail.com">neelu.rsa@gmail.com</a> to request access to edit sections of the website. Include your username ({{ current_user.username }}) and the level(s) you wish to edit in your email.</div>
+    {% endif %}
+    <div class="row">
+      <div class="level col-sm-4 text-center">
+        <a href="{{ url_for('view.summary', level='bronze') }}" class="section bronze btn">
+          Bronze
+        </a>
+        {% if current_user.is_authenticated %}
+          {% if current_user.bronze_access %}
+            <p class="text-success">You <b>are</b> authorised to edit the Bronze section.</p>
+          {% else %}
+            <p class="text-danger">You <b>are not</b> authorised to edit the Bronze section.</p>
+          {% endif %}
+        {% endif %}
+      </div>
+      <div class="level col-sm-4 text-center">
+        <a href="{{ url_for('view.summary', level='silver') }}" class="section silver btn">
+          Silver
+        </a>
+        {% if current_user.is_authenticated %}
+          {% if current_user.silver_access %}
+            <p class="text-success">You <b>are</b> authorised to edit the Silver section.</p>
+          {% else %}
+            <p class="text-danger">You <b>are not</b> authorised to edit the Silver section.</p>
+          {% endif %}
+        {% endif %}
+      </div>
+      <div class="level col-sm-4 text-center">
+        <a href="{{ url_for('view.summary', level='gold') }}" class="section gold btn">
+          Gold
+        </a>
+        {% if current_user.is_authenticated %}
+          {% if current_user.gold_access %}
+            <p class="text-success">You <b>are</b> authorised to edit the Gold section.</p>
+          {% else %}
+            <p class="text-danger">You <b>are not</b> authorised to edit the Gold section.</p>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/select.css') }}" />
+{% endblock head %}

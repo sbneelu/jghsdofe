@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Open+Sans:400,600">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-fixes.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/navbar.css') }}">
+  {% block head %}{% endblock head %}
+  {% if title %}
+    <title>{{ title }} - JGHS DofE</title>
+  {% else %}
+    <title>JGHS DofE</title>
+  {% endif %}
+</head>
+<body>
+  <nav class="navbar navbar-red">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span>Menu</span>
+        </button>
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">JGHS DofE</a>
+      </div>
+
+
+      <div class="collapse navbar-collapse" id="navbar">
+        <ul class="nav navbar-nav">
+          <li><a class="nav-item nav-link" href="{{ url_for('view.bronze') }}">Bronze</a></li>
+          <li><a class="nav-item nav-link" href="{{ url_for('view.silver') }}">Silver</a></li>
+          <li><a class="nav-item nav-link" href="{{ url_for('view.gold') }}">Gold</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('users.change_password') }}">Change your Password</a></li>
+            <li><a href="{{ url_for('users.logout') }}">Log Out</a></li>
+          {% else %}
+            <li><a href="{{ url_for('users.login') }}">Log In</a></li>
+            <li><a href="{{ url_for('users.signup') }}">Sign Up</a></li>
+          {% endif %}
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container full-height">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock content %}
+  </div>
+
+  <script src="{{ url_for('static', filename='scripts/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
+  {% block body %}{% endblock body %}
+</body>
+</html>

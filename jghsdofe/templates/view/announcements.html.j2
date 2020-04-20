@@ -1,0 +1,59 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('view.summary', level=level) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8">
+      <h1 class="text-center">Announcements</h1>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+
+  {% if starred_announcements|length == 0 and unstarred_announcements|length == 0 %}
+    <div class="text-center content-section">
+      No announcements.
+    </div>
+  {% endif %}
+  {% for announcement in starred_announcements %}
+    <div class="announcement starred-announcement content-section">
+      <div class="starred"><span class="star">&#x2605;</span> Starred</div>
+      <p>{{ announcement.content }}</p>
+      <i>
+
+        {% set date_posted_hour = announcement.date_posted.hour|string if announcement.date_posted.hour > 10 else '0' + announcement.date_posted.hour|string %}
+        {% set date_posted_minute = announcement.date_posted.minute|string if announcement.date_posted.minute > 10 else '0' + announcement.date_posted.minute|string %}
+
+        {% if announcement.edited %}
+        {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
+        {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
+          Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
+          <br>
+          First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+        {% else %}
+          Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+        {% endif %}
+      </i>
+    </div>
+  {% endfor %}
+  {% for announcement in unstarred_announcements %}
+    <div class="announcement content-section">
+      <p>{{ announcement.content }}</p>
+      <i>
+
+        {% set date_posted_hour = announcement.date_posted.hour|string if announcement.date_posted.hour > 10 else '0' + announcement.date_posted.hour|string %}
+        {% set date_posted_minute = announcement.date_posted.minute|string if announcement.date_posted.minute > 10 else '0' + announcement.date_posted.minute|string %}
+
+
+        {% if announcement.edited %}
+        {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
+        {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
+          Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
+          <br>
+          First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+        {% else %}
+          Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+        {% endif %}
+      </i>
+    </div>
+  {% endfor %}
+{% endblock content %}
