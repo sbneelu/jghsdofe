@@ -50,6 +50,12 @@
             {{ form.confirm_password(class="form-control form-control-lg") }}
           {% endif %}
         </div>
+        <div class="g-recaptcha" data-sitekey="{{ captcha_sitekey }}"></div>
+        {% if captcha_error %}
+          <div class="invalid-feedback">
+            <span>{{ captcha_error }}</span>
+          </div>
+        {% endif %}
       </fieldset>
       <p>
         Once you have signed up, please email <a href="mailto:neelu.rsa@gmail.com">neelu.rsa@gmail.com</a> to request access to edit sections of the website. Include your username and the level(s) you wish to edit in your email.
@@ -64,3 +70,6 @@
   </div>
 
 {% endblock content %}
+{% block head %}
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock head %}

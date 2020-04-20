@@ -8,3 +8,5 @@ with open('config.json', 'r') as f:
 class Config:
     SECRET_KEY = config['SECRET_KEY']
     SQLALCHEMY_DATABASE_URI = config['SQLALCHEMY_DATABASE_URI']
+    RECAPTCHA_SECRET = config['RECAPTCHA_SECRET']
+    RECAPTCHA_SITEKEY = config['RECAPTCHA_SITEKEY']
