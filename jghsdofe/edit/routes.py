@@ -11,6 +11,14 @@ from urllib.parse import unquote
 
 edit = Blueprint('edit', __name__)
 
+
+def html_escape(s):
+    return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>')
+
+def html_unescape(s):
+    return s.replace('<br>', '\n').replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+
+
 @edit.route('/<string:level>/edit/announcements/star/<int:id>')
 def star_announcement(level, id):
     announcement = Announcement.query.get(id)
@@ -66,7 +74,7 @@ def new_announcement(level):
     if current_user.is_authenticated and getattr(current_user, level + '_access'):
         form = AnnouncementForm()
         if form.validate_on_submit():
-            announcement = Announcement(content=form.content.data.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>'), starred=form.starred.data, edited=False, date_posted=datetime.datetime.utcnow(), date_edited=datetime.datetime.utcnow(), level=level)
+            announcement = Announcement(content=html_escape(form.content.data), starred=form.starred.data, edited=False, date_posted=datetime.datetime.utcnow(), date_edited=datetime.datetime.utcnow(), level=level)
             db.session.add(announcement)
             db.session.commit()
             return redirect(url_for('view.announcements', level=level))
@@ -86,14 +94,14 @@ def edit_announcement(level, id):
         form = AnnouncementForm()
 
         if form.validate_on_submit():
-            announcement.content = form.content.data.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>')
+            announcement.content = html_escape(form.content.data)
             announcement.starred = form.starred.data
             announcement.edited = True
             announcement.date_edited = datetime.datetime.utcnow()
             db.session.commit()
             return redirect(url_for('view.announcements', level=level))
         elif request.method == 'GET':
-            form.content.data = announcement.content.replace('<br>', '\n').replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+            form.content.data = html_unescape(announcement.content)
             form.starred.data = announcement.starred
         return render_template('edit/new-announcement.html.j2', level=level, title='New announcement | ' + level.capitalize(), form=form, announcement=announcement)
     flash('You are not authorised to edit announcements for this level.', 'danger')
@@ -106,7 +114,9 @@ def new_section(level):
     if current_user.is_authenticated and getattr(current_user, level + '_access'):
         form = SectionDetailsForm()
         if form.validate_on_submit():
-            section = Section(level=level, title=form.title.data, description=form.description.data, order=5)
+            last_section = Section.query.filter_by(level=level).order_by(Section.order.desc()).first()
+            order = last_section.order + 1 if last_section else 1
+            section = Section(level=level, title=html_escape(form.title.data), description=html_escape(form.description.data), order=order)
             db.session.add(section)
             db.session.commit()
             return redirect(url_for('edit.edit_section', level=level, id=section.id))
@@ -178,12 +188,12 @@ def edit_section_details(level, id):
         form = SectionDetailsForm()
 
         if form.validate_on_submit():
-            section.title = form.title.data
-            section.description = form.description.data
+            section.title = html_escape(form.title.data)
+            section.description = html_escape(form.description.data)
             db.session.commit()
             return redirect(url_for('edit.edit_section', level=level, id=id))
-        form.title.data = section.title
-        form.description.data = section.description if section.description else ''
+        form.title.data = html_unescape(section.title)
+        form.description.data = html_unescape(section.description) if section.description else ''
         return render_template('edit/edit-section-details.html.j2', level=level, title='Edit section | ' + level.capitalize(), form=form, id=id)
     flash('You are not authorised to edit sections for this level.', 'danger')
     return redirect(url_for('view.links', level=level))
@@ -199,7 +209,9 @@ def new_link(level, section_id):
     if current_user.is_authenticated and getattr(current_user, level + '_access') and section.level == level:
         form = LinkDetailsForm()
         if form.validate_on_submit():
-            link = Link(section_id=section_id, title=form.title.data, url=form.link.data, order=5)
+            last_link = Link.query.filter_by(section_id=section_id).order_by(Link.order.desc()).first()
+            order = last_link.order + 1 if last_link else 1
+            link = Link(section_id=section_id, title=html_escape(form.title.data), url=form.link.data, order=order)
             db.session.add(link)
             db.session.commit()
             return redirect(url_for('edit.edit_section', level=level, id=section_id))
@@ -222,11 +234,11 @@ def edit_link(level, section_id, id):
         if not link.is_doc:
             form = LinkDetailsForm()
             if form.validate_on_submit():
-                link.title = form.title.data
+                link.title = html_escape(form.title.data)
                 link.url = form.link.data
                 db.session.commit()
                 return redirect(url_for('edit.edit_section', level=level, id=section_id))
-            form.title.data = link.title
+            form.title.data = html_unescape(link.title)
             form.link.data = link.url
             return render_template('edit/edit-link.html.j2', level=level, title='Edit link | ' + level.capitalize(), form=form, section=section)
         else:
@@ -234,24 +246,24 @@ def edit_link(level, section_id, id):
             form = EditFileDetailsForm()
 
             if form.validate_on_submit():
-                filename = form.file.data.filename
-                url = url_for('main.file', filename=level + '/' + filename)
+                filename = secure_filename(form.file.data.filename)
+                url = url_for('main.file', level=level, filename=filename)
                 if os.path.exists(os.path.join(current_app.root_path, 'files', level, filename)) and url != link.url and form.file.data.filename:
                     file_error = 'A file with the same name already exists. Please rename the file and try uploading it again.'
                     return render_template('edit/edit-file.html.j2', level=level, title='Edit file | ' + level.capitalize(), form=form, section=section, file_error=file_error)
-                link.title = form.title.data
-                if form.file.data.filename:
+                link.title = html_escape(form.title.data)
+                if filename:
 
                     old_url = unquote(link.url).split('/')
                     old_filename = ''.join(old_url[3:])
                     os.remove(os.path.join(current_app.root_path, 'files', level, old_filename))
                     form.file.data.save(os.path.join(current_app.root_path, 'files', level, filename))
-                    link.url = url_for('main.file', filename=level + '/' + filename)
+                    link.url = url_for('main.file', level=level, filename=filename)
 
                 db.session.commit()
 
                 return redirect(url_for('edit.edit_section', level=level, id=section_id))
-            form.title.data = link.title
+            form.title.data = html_unescape(link.title)
             return render_template('edit/edit-file.html.j2', level=level, title='New file | ' + level.capitalize(), form=form, section=section, file_error=file_error)
     flash('You are not authorised to edit links for this level.', 'danger')
     return redirect(url_for('view.links', level=level))
@@ -290,17 +302,19 @@ def new_file(level, section_id):
     if current_user.is_authenticated and getattr(current_user, level + '_access') and section.level == level:
         form = FileDetailsForm()
         if form.validate_on_submit():
-            filename = form.file.data.filename
+            filename = secure_filename(form.file.data.filename)
             if os.path.exists(os.path.join(current_app.root_path, 'files', level, filename)):
                 file_error = 'A file with the same name already exists. Please rename the file and try uploading it again.'
                 return render_template('edit/new-file.html.j2', level=level, title='New file | ' + level.capitalize(), form=form, section=section, file_error=file_error)
-            link = Link(section_id=section_id, title=form.title.data, url='', order=5, is_doc=True)
+            last_link = Link.query.filter_by(section_id=section_id).order_by(Link.order.desc()).first()
+            order = last_link.order + 1 if last_link else 1
+            link = Link(section_id=section_id, title=html_escape(form.title.data), url='', order=order, is_doc=True)
             db.session.add(link)
             db.session.commit()
 
             form.file.data.save(os.path.join(current_app.root_path, 'files', level, filename))
 
-            link.url = url_for('main.file', filename=level + '/' + filename)
+            link.url = url_for('main.file', level=level, filename=filename)
             db.session.commit()
 
             return redirect(url_for('edit.edit_section', level=level, id=section_id))
