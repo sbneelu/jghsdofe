@@ -1,0 +1,41 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8">
+      <h1 class="text-center">Are you sure you would like to delete this section?</h1>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+  <div class="content-section">
+    <div style="font-size: 1.5em;">
+      <div>
+        <h3>Title</h3>
+        {{ section.title }}
+      </div>
+      {% if section.description %}
+        <div>
+          <h3>Description</h3>
+          {{ section.description }}
+        </div>
+      {% endif %}
+      {% if links | length > 0 %}
+        <h3>Links</h3>
+        <ul>
+          {% for link in links %}
+            <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      <br>
+      <a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary">Cancel</a>
+      <a href="{{ url_for('edit.confirm_delete_section', level=level, id=section.id) }}" class="btn btn-primary">Delete</a>
+    </div>
+
+
+  </div>
+
+
+
+{% endblock content %}

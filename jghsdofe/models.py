@@ -33,14 +33,14 @@ class Section(db.Model):
 
 class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    is_doc = db.Column(db.Boolean, nullable=False)
+    is_doc = db.Column(db.Boolean, nullable=False, default=False)
     title = db.Column(db.Text, nullable=False)
     url = db.Column(db.Text, nullable=False)
     section_id = db.Column(db.Integer, db.ForeignKey('section.id'), nullable=False)
     order = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return f"Link('{self.level}', '{self.section_id}', '{self.title}')"
+        return f"Link('{self.section_id}', '{self.title}')"
 
 
 class User(db.Model, UserMixin):

@@ -8,6 +8,17 @@
     </div>
     <div class="col-sm-2 col-md-2"></div>
   </div>
+
+  <div class="row container mb-4 mt-2">
+    <div class="col-xs-12 col-md-6 container">
+      <a href="{{ url_for('edit.new_section', level=level) }}" class="btn btn-primary" style="width: 100%;">New Section</a>
+    </div>
+    <div class="col-xs-12 col-md-6 container">
+      <a href="#" class="btn btn-primary" style="width: 100%;">Change Order</a>
+    </div>
+
+  </div>
+
   {% if sections|length == 0 %}
     <div class="text-center content-section">
       No links or documents.
@@ -24,9 +35,11 @@
           {% endif %}
           <ul>
             {% for link in links %}
-              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
             {% endfor %}
           </ul>
+          <a href="{{ url_for('edit.edit_section', level=level, id=section.id) }}" class="btn btn-primary">Edit</a>
+          <a href="{{ url_for('edit.delete_section', level=level, id=section.id) }}" class="btn btn-primary">Delete</a>
         </div>
       </div>
     {% endfor %}

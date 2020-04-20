@@ -1,0 +1,54 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('edit.edit_section', level=level, id=section.id) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8">
+      <h1 class="text-center">Edit file in section ({{ section.title }})</h1>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+  <div class="content-section">
+    <form action="" method="post" novalidate="novalidate" enctype="multipart/form-data">
+      {{ form.hidden_tag() }}
+      <fieldset class="form-group">
+        <div class="form-group">
+          {{ form.title.label(class="form-control-label") }}
+          {% if form.title.errors %}
+            {{ form.title(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.title.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.title(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ form.file.label(class="form-control-label") }}
+          {% if form.file.errors or file_error %}
+            {{ form.file(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.file.errors %}
+                <span>{{ error }}</span>
+              {% endfor %}
+              {% if file_error %}
+                <span>{{ file_error }}</span>
+              {% endif %}
+            </div>
+          {% else %}
+            {{ form.file(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+      </fieldset>
+      <div class="form-group">
+        <a href="{{ url_for('edit.edit_section', level=level, id=section.id) }}" class="btn btn-primary">Cancel</a>
+        {{ form.submit(class="btn btn-primary") }}
+      </div>
+    </form>
+  </div>
+
+
+
+{% endblock content %}

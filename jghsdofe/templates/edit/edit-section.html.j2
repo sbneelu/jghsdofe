@@ -1,0 +1,46 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8">
+      <h1 class="text-center">Edit Section</h1>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+  <div class="content-section">
+    <div style="font-size: 1.5em;">
+      <div>
+        <h3>Title <a href="{{ url_for('edit.edit_section_details', level=level, id=section.id) }}" class="btn btn-primary">Edit</a></h3>
+        {{ section.title }}
+      </div>
+      <div>
+        {% if section.description %}
+          <h3>Description <a href="{{ url_for('edit.edit_section_details', level=level, id=section.id) }}" class="btn btn-primary">Edit</a></h3>
+          {{ section.description }}
+        {% else %}
+          <h3>Description</h3>
+          <a href="{{ url_for('edit.edit_section_details', level=level, id=section.id) }}" class="btn btn-primary">Add Description</a>
+
+        {% endif %}
+      </div>
+
+      <h3>Links</h3>
+      <div class="mb-2">
+        <a href="{{ url_for('edit.new_link', level=level, section_id=section.id) }}" class="btn btn-primary">New Link</a> <a href="{{ url_for('edit.new_file', level=level, section_id=section.id) }}" class="btn btn-primary">New File</a> <a href="#" class="btn btn-primary">Change Order</a>
+      </div>
+      <ul>
+        {% for link in links %}
+          <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a> [{% if link.is_doc %}File{% else %}Link{% endif %}] <a href="{{ url_for('edit.edit_link', level=level, section_id=section.id, id=link.id) }}" class="btn btn-primary">Edit</a> <a href="{{ url_for('edit.delete_link', level=level, section_id=section.id, id=link.id) }}" class="btn btn-primary">Delete</a></li>
+        {% endfor %}
+      </ul>
+      <a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary">Cancel</a>
+      <a href="{{ url_for('edit.delete_section', level=level, id=section.id) }}" class="btn btn-primary">Delete Section</a>
+    </div>
+
+
+  </div>
+
+
+
+{% endblock content %}
