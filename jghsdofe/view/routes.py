@@ -114,3 +114,15 @@ def calendar(level):
         return render_template('edit/calendar.html.j2', title='Calendar | ' + level.capitalize(), level=level, events=events)
 
     return render_template('view/calendar.html.j2', title='Calendar | ' + level.capitalize(), level=level, events=events)
+
+
+@view.route('/<string:level>/calendar/<int:id>')
+def event(level, id):
+    event = Event.query.get(id)
+    if not event:
+        flash('Invalid event.', 'danger')
+        return redirect(url_for('view.calendar', level=level))
+    authenticated = False
+    if current_user.is_authenticated and getattr(current_user, level + '_access') and event.level == level:
+        authenticated = True
+    return render_template('view/event.html.j2', level=level, title='Event | ' + level.capitalize(), event=event, authenticated=authenticated)

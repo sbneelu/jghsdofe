@@ -80,90 +80,96 @@
         {% else %}
           {% for event in events %}
             <div class="event content-section">
-              <div class="text-center">
+              <div class="text-center mb-2">
                 <b>{{ event.title }}</b>
               </div>
 
               <div>
                 {% if event.end %}
                   {% if event.start.day == event.end.day and event.start.month == event.end.month and event.start.year == event.end.year %}
-                    <b>Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
-                    <br>
-                    {% set hr = event.start.hour|string %}
-                    {% set mn = event.start.minute|string %}
-                    {% if hr|length == 1 %}
-                      {% set hr = '0' + hr %}
-                    {% endif %}
-                    {% if mn|length == 1 %}
-                      {% set mn = '0' + mn %}
-                    {% endif %}
-                    <b>Start Time: </b> {{ hr }}:{{ mn }}
-                    <br>
-                    {% set hr = event.end.hour|string %}
-                    {% set mn = event.end.minute|string %}
-                    {% if hr|length == 1 %}
-                      {% set hr = '0' + hr %}
-                    {% endif %}
-                    {% if mn|length == 1 %}
-                      {% set mn = '0' + mn %}
-                    {% endif %}
-                    <b>End Time: </b> {{ hr }}:{{ mn }}
+                    <div class="mb-2">
+                      <b>Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
+                    </div>
+                    <div class="mb-2">
+                      {% set hr = event.start.hour|string %}
+                      {% set mn = event.start.minute|string %}
+                      {% if hr|length == 1 %}
+                        {% set hr = '0' + hr %}
+                      {% endif %}
+                      {% if mn|length == 1 %}
+                        {% set mn = '0' + mn %}
+                      {% endif %}
+                      <b>Start Time: </b> {{ hr }}:{{ mn }}
+                      <br>
+                      {% set hr = event.end.hour|string %}
+                      {% set mn = event.end.minute|string %}
+                      {% if hr|length == 1 %}
+                        {% set hr = '0' + hr %}
+                      {% endif %}
+                      {% if mn|length == 1 %}
+                        {% set mn = '0' + mn %}
+                      {% endif %}
+                      <b>End Time: </b> {{ hr }}:{{ mn }}
+                    </div>
+
 
                   {% else %}
-                    <b>Start Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
-                    <br>
-                    {% set hr = event.start.hour|string %}
-                    {% set mn = event.start.minute|string %}
-                    {% if hr|length == 1 %}
-                      {% set hr = '0' + hr %}
-                    {% endif %}
-                    {% if mn|length == 1 %}
-                      {% set mn = '0' + mn %}
-                    {% endif %}
-                    <b>Start Time: </b> {{ hr }}:{{ mn }}
-                    <br>
-                    <br>
+                    <div class="mb-2">
+                      <b>Start Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
+                      <br>
+                      {% set hr = event.start.hour|string %}
+                      {% set mn = event.start.minute|string %}
+                      {% if hr|length == 1 %}
+                        {% set hr = '0' + hr %}
+                      {% endif %}
+                      {% if mn|length == 1 %}
+                        {% set mn = '0' + mn %}
+                      {% endif %}
+                      <b>Start Time: </b> {{ hr }}:{{ mn }}
+                    </div>
 
-                    <b>End Date: </b> {{ list_of_days[event.end.weekday()] }} {{ event.end.day }} {{ list_of_months[event.end.month] }} {{ event.end.year }}
-                    <br>
-                    {% set hr = event.end.hour|string %}
-                    {% set mn = event.end.minute|string %}
-                    {% if hr|length == 1 %}
-                      {% set hr = '0' + hr %}
-                    {% endif %}
-                    {% if mn|length == 1 %}
-                      {% set mn = '0' + mn %}
-                    {% endif %}
-                    <b>End Time: </b> {{ hr }}:{{ mn }}
+                    <div class="mb-2">
+                      <b>End Date: </b> {{ list_of_days[event.end.weekday()] }} {{ event.end.day }} {{ list_of_months[event.end.month] }} {{ event.end.year }}
+                      <br>
+                      {% set hr = event.end.hour|string %}
+                      {% set mn = event.end.minute|string %}
+                      {% if hr|length == 1 %}
+                        {% set hr = '0' + hr %}
+                      {% endif %}
+                      {% if mn|length == 1 %}
+                        {% set mn = '0' + mn %}
+                      {% endif %}
+                      <b>End Time: </b> {{ hr }}:{{ mn }}
+                    </div>
 
                   {% endif %}
 
 
                 {% else %}
-                  <b>Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
-                  <br>
-                  {% set hr = event.start.hour|string %}
-                  {% set mn = event.start.minute|string %}
-                  {% if hr|length == 1 %}
-                    {% set hr = '0' + hr %}
-                  {% endif %}
-                  {% if mn|length == 1 %}
-                    {% set mn = '0' + mn %}
-                  {% endif %}
-                  <b>Time: </b> {{ hr }}:{{ mn }}
+                  <div class="mb-2">
+                    <b>Date: </b> {{ list_of_days[event.start.weekday()] }} {{ event.start.day }} {{ list_of_months[event.start.month] }} {{ event.start.year }}
+                    {% set hr = event.start.hour|string %}
+                    {% set mn = event.start.minute|string %}
+                    {% if hr|length == 1 %}
+                      {% set hr = '0' + hr %}
+                    {% endif %}
+                    {% if mn|length == 1 %}
+                      {% set mn = '0' + mn %}
+                    {% endif %}
+                    <b>Time: </b> {{ hr }}:{{ mn }}
+                  </div>
+
 
 
                 {% endif %}
-                <div>
+                <div class="mb-2">
                   {% if event.location %}
-                    <br>
                     <b>Location:</b> {{ event.location }}
                   {% endif %}
                 </div>
 
-                <div>
+                <div class="mb-2">
                   {% if event.description %}
-                    <br>
                     <b>Description:</b> {{ event.description }}
                   {% endif %}
                 </div>

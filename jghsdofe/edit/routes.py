@@ -1,8 +1,8 @@
 from flask import abort, render_template, url_for, redirect, flash, request, Blueprint, current_app
 from flask_login import current_user, login_required
-from jghsdofe.models import Announcement, Section, Link
+from jghsdofe.models import Announcement, Section, Link, Event
 from jghsdofe import db
-from jghsdofe.edit.forms import AnnouncementForm, SectionDetailsForm, LinkDetailsForm, FileDetailsForm, EditFileDetailsForm
+from jghsdofe.edit.forms import AnnouncementForm, SectionDetailsForm, LinkDetailsForm, FileDetailsForm, EditFileDetailsForm, EventForm
 import datetime
 import os
 from werkzeug import secure_filename
@@ -13,9 +13,13 @@ edit = Blueprint('edit', __name__)
 
 
 def html_escape(s):
+    if s is None:
+        return None
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>')
 
 def html_unescape(s):
+    if s is None:
+        return None
     return s.replace('<br>', '\n').replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
 
 
@@ -321,3 +325,99 @@ def new_file(level, section_id):
         return render_template('edit/new-file.html.j2', level=level, title='New file | ' + level.capitalize(), form=form, section=section, file_error=file_error)
     flash('You are not authorised to create links for this level.', 'danger')
     return redirect(url_for('view.links', level=level))
+
+
+@edit.route('/<string:level>/edit/calendar/delete/<string:id>')
+@login_required
+def delete_event(level, id):
+    event = Event.query.get(id)
+    if not event:
+        flash('Invalid section.', 'danger')
+        return redirect(url_for('view.calendar', level=level))
+    if current_user.is_authenticated and getattr(current_user, level + '_access') and event.level == level:
+        return render_template('edit/delete-event.html.j2', level=level, title='Delete event | ' + level.capitalize(), event=event)
+    flash('You are not authorised to delete events for this level.', 'danger')
+    return redirect(url_for('view.calendar', level=level))
+
+
+@edit.route('/<string:level>/edit/calendar/delete/<string:id>/confirm')
+@login_required
+def confirm_delete_event(level, id):
+    event = Event.query.get(id)
+    if not event:
+        flash('Invalid section.', 'danger')
+        return redirect(url_for('view.calendar', level=level))
+    if current_user.is_authenticated and getattr(current_user, level + '_access') and event.level == level:
+        db.session.delete(event)
+        db.session.commit()
+        return redirect(url_for('view.calendar', level=level))
+    flash('You are not authorised to delete events for this level.', 'danger')
+    return redirect(url_for('view.calendar', level=level))
+
+
+@edit.route('/<string:level>/edit/calendar/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def event(level, id):
+    event = Event.query.get(id)
+    if not event:
+        flash('Invalid event.', 'danger')
+        return redirect(url_for('view.calendar', level=level))
+    if current_user.is_authenticated and getattr(current_user, level + '_access') and event.level == level:
+        form = EventForm()
+        if form.validate_on_submit():
+            event.title = html_escape(form.title.data)
+            start_hour, start_minute = html_escape(form.start_time.data).split(':')
+            event.start = datetime.datetime(form.start_date.data.year, form.start_date.data.month, form.start_date.data.day, int(start_hour), int(start_minute), 0)
+            if form.end_time.data:
+                end_hour, end_minute = html_escape(form.end_time.data).split(':')
+                if form.end_date.data:
+                    event.end = datetime.datetime(form.end_date.data.year, form.end_date.data.month, form.end_date.data.day, int(end_hour), int(end_minute), 0)
+                else:
+                    event.end = datetime.datetime(form.start_date.data.year, form.start_date.data.month, form.start_date.data.day, int(end_hour), int(end_minute), 0)
+            else:
+                event.end = None
+            event.location = form.location.data
+            event.description = form.description.data
+            db.session.commit()
+            return redirect(url_for('view.event', level=level, id=id))
+        form.title.data = html_unescape(event.title)
+        form.description.data = html_unescape(event.description)
+        form.location.data = html_unescape(event.location)
+        start = event.start
+        form.start_date.data = datetime.date(start.year, start.month, start.day)
+        form.start_time.data = start.strftime("%H:%M")
+        end = event.end
+        if end:
+            form.end_date.data = datetime.date(end.year, end.month, end.day)
+            form.end_time.data = end.strftime("%H:%M")
+        return render_template('edit/event.html.j2', level=level, title='Edit Event | ' + level.capitalize(), form=form, new_event=False, id=id)
+    flash('You are not authorised to edit events for this level.', 'danger')
+    return redirect(url_for('view.event', level=level, id=id))
+
+
+@edit.route('/<string:level>/edit/calendar/new', methods=['GET', 'POST'])
+@login_required
+def new_event(level):
+    if current_user.is_authenticated and getattr(current_user, level + '_access'):
+        form = EventForm()
+        if form.validate_on_submit():
+            title = html_escape(form.title.data)
+            start_hour, start_minute = form.start_time.data.split(':')
+            start = datetime.datetime(form.start_date.data.year, form.start_date.data.month, form.start_date.data.day, int(start_hour), int(start_minute), 0)
+            if form.end_time.data:
+                end_hour, end_minute = form.end_time.data.split(':')
+                if form.end_date.data:
+                    end = datetime.datetime(form.end_date.data.year, form.end_date.data.month, form.end_date.data.day, int(end_hour), int(end_minute), 0)
+                else:
+                    end = datetime.datetime(form.start_date.data.year, form.start_date.data.month, form.start_date.data.day, int(end_hour), int(end_minute), 0)
+            else:
+                end = None
+            location = form.location.data
+            description = form.description.data
+            event = Event(title=title, start=start, end=end, location=location, description=description, level=level)
+            db.session.add(event)
+            db.session.commit()
+            return redirect(url_for('view.event', level=level, id=event.id))
+        return render_template('edit/event.html.j2', level=level, title='New Event | ' + level.capitalize(), form=form, new_event=True, id=None)
+    flash('You are not authorised to create events for this level.', 'danger')
+    return redirect(url_for('view.calendar', level=level))

@@ -1,0 +1,79 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  {% set months = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('view.calendar', level=level) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8">
+      <h1 class="text-center">Are you sure you would like to delete this event?</h1>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+  <div class="content-section">
+    <div style="font-size: 1.5em;">
+      <div class="mb-2">
+        <b>Title:</b> {{ event.title }}
+      </div>
+      {% set start = event.start %}
+      {% set end = event.end %}
+      {% set location = event.location %}
+      {% set description = event.description %}
+
+      {% if not end %}
+        <div class="mb-2">
+          <b>Date:</b> {{ days_of_week[start.weekday()] }} {{ start.day  | string }} {{ months[start.month] }} {{ start.year | string }}
+          <br>
+          <b>Time:</b> {{ start.strftime("%H:%M") }}
+        </div>
+
+      {% else %}
+        {% if start.day == end.day and start.month == end.month and start.year == end.year %}
+          <div class="mb-2">
+            <b>Date:</b> {{ days_of_week[start.weekday()] }} {{ start.day  | string }} {{ months[start.month] }} {{ start.year | string }}
+          </div>
+          <div class="mb-2">
+            <b>Start Time:</b> {{ start.strftime("%H:%M") }}
+            <br>
+            <b>End Time:</b> {{ end.strftime("%H:%M") }}
+          </div>
+
+        {% else %}
+          <div class="mb-2">
+            <b>Start Date:</b> {{ days_of_week[start.weekday()] }} {{ start.day  | string }} {{ months[start.month] }} {{ start.year | string }}
+            <br>
+            <b>Start Time:</b> {{ start.strftime("%H:%M") }}
+          </div>
+          <div class="mb-2">
+            <b>End Date:</b> {{ days_of_week[end.weekday()] }} {{ end.day  | string }} {{ months[end.month] }} {{ end.year | string }}
+            <br>
+            <b>End Time:</b> {{ end.strftime("%H:%M") }}
+          </div>
+
+        {% endif %}
+      {% endif %}
+
+      {% if location %}
+        <div class="mb-2">
+          <b>Location:</b> {{ location }}
+        </div>
+      {% endif %}
+
+      {% if description %}
+        <div class="mb-2">
+          <b>Description:</b> {{ description }}
+        </div>
+      {% endif %}
+
+
+
+
+      <a href="{{ url_for('view.calendar', level=level) }}" class="btn btn-primary">Cancel</a>
+      <a href="{{ url_for('edit.confirm_delete_event', level=level, id=event.id) }}" class="btn btn-primary">Delete</a>
+    </div>
+
+
+  </div>
+
+
+
+{% endblock content %}
