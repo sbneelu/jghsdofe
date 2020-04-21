@@ -1,0 +1,46 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('edit.edit_section', level=level, id=section.id) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8">
+      <h1 class="text-center">Reorder links</h1>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+  <div class="content-section">
+    <div style="font-size: 1.5em;">
+      <div class="text-center">
+        <h2>{{ section.title }}</h2>
+        {% if section.description %}
+          {{ section.description }}
+        {% endif %}
+      </div>
+      <div class="mb-2">
+      </div>
+      {% if links | length == 0 %}
+        <p>There are no links in this section. Click "Go back" to go back to the edit page to add links.</p>
+        <a href="{{ url_for('edit.edit_section', level=level, id=section.id) }}" class="btn btn-primary">Go back</a>
+      {% else %}
+        <ul>
+          {% for link in links %}
+            <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a> [{% if link.is_doc %}File{% else %}Link{% endif %}]</li>
+          {% endfor %}
+        </ul>
+        <form action="" method="post" novalidate="novalidate">
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            <a href="{{ url_for('edit.edit_section', level=level, id=section.id) }}" class="btn btn-primary">Cancel</a>
+            {{ form.submit(class="btn btn-primary") }}
+          </div>
+        </form>
+      {% endif %}
+
+    </div>
+
+
+  </div>
+
+
+
+{% endblock content %}

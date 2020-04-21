@@ -2,7 +2,7 @@ from flask import abort, render_template, url_for, redirect, flash, request, Blu
 from flask_login import current_user, login_required
 from jghsdofe.models import Announcement, Section, Link, Event
 from jghsdofe import db
-from jghsdofe.edit.forms import AnnouncementForm, SectionDetailsForm, LinkDetailsForm, FileDetailsForm, EditFileDetailsForm, EventForm
+from jghsdofe.edit.forms import AnnouncementForm, SectionDetailsForm, LinkDetailsForm, FileDetailsForm, EditFileDetailsForm, EventForm, OrderForm
 import datetime
 import os
 from werkzeug import secure_filename
@@ -17,10 +17,20 @@ def html_escape(s):
         return None
     return s.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('\n', '<br>')
 
+
 def html_unescape(s):
     if s is None:
         return None
     return s.replace('<br>', '\n').replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+
+
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 
 
 @edit.route('/<string:level>/edit/announcements/star/<int:id>')
@@ -421,3 +431,95 @@ def new_event(level):
         return render_template('edit/event.html.j2', level=level, title='New Event | ' + level.capitalize(), form=form, new_event=True, id=None)
     flash('You are not authorised to create events for this level.', 'danger')
     return redirect(url_for('view.calendar', level=level))
+
+
+@edit.route('/<string:level>/edit/links/<int:id>/order', methods=['GET', 'POST'])
+def order_links(level, id):
+    section = Section.query.get(id)
+    if not section:
+        flash('Invalid section.', 'danger')
+        return redirect(url_for('view.links', level=level))
+    if current_user.is_authenticated and getattr(current_user, level + '_access') and section.level == level:
+        links = Link.query.filter_by(section_id=id).all()
+        form = OrderForm()
+        if form.validate_on_submit():
+            order = form.order.data
+            error = True
+            if order.count(',') == len(links):
+                error = False
+                order_str = order.split(',')[:-1]
+                order = []
+                for ele in order_str:
+                    if is_int(ele):
+                        order.append(int(ele))
+                    else:
+                        error = True
+                if not error:
+                    ids = [link.id for link in links]
+                    order_ids = order
+                    ids.sort()
+                    order_ids = sorted(order)
+                    if ids == order_ids:
+                        for i, link_id in enumerate(order):
+                            link = Link.query.get(link_id)
+                            link.order = i + 1
+                        db.session.commit()
+                        return redirect(url_for('edit.edit_section', level=level, id=id))
+                    error = True
+            if error:
+                flash('An error occurred. Please try again.', 'danger')
+
+        order = ''
+        links.sort(key=lambda l: l.order)
+        for link in links:
+            order += str(link.id)
+            order += ','
+        form.order.data = order
+        return render_template('edit/order-links.html.j2', title='Reorder links | ' + level.capitalize(), level=level, form=form, section=section, links=links)
+
+    flash('You are not authorised to edit sections for this level.', 'danger')
+    return redirect(url_for('view.links', level=level))
+
+
+@edit.route('/<string:level>/edit/links/order', methods=['GET', 'POST'])
+def order_sections(level):
+    if current_user.is_authenticated and getattr(current_user, level + '_access'):
+        sections = Section.query.filter_by(level=level).all()
+        form = OrderForm()
+        if form.validate_on_submit():
+            order = form.order.data
+            error = True
+            if order.count(',') == len(sections):
+                error = False
+                order_str = order.split(',')[:-1]
+                order = []
+                for ele in order_str:
+                    if is_int(ele):
+                        order.append(int(ele))
+                    else:
+                        error = True
+                if not error:
+                    ids = [section.id for section in sections]
+                    order_ids = order
+                    ids.sort()
+                    order_ids = sorted(order)
+                    if ids == order_ids:
+                        for i, section_id in enumerate(order):
+                            section = Section.query.get(section_id)
+                            section.order = i + 1
+                        db.session.commit()
+                        return redirect(url_for('view.links', level=level))
+                    error = True
+            if error:
+                flash('An error occurred. Please try again.', 'danger')
+
+        order = ''
+        sections.sort(key=lambda l: l.order)
+        for section in sections:
+            order += str(section.id)
+            order += ','
+        form.order.data = order
+        return render_template('edit/order-sections.html.j2', title='Reorder sections | ' + level.capitalize(), level=level, form=form, sections=sections)
+
+    flash('You are not authorised to edit sections for this level.', 'danger')
+    return redirect(url_for('view.links', level=level))

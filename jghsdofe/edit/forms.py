@@ -1,7 +1,7 @@
 from flask import url_for
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField, DateField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField, DateField, HiddenField
 from wtforms.validators import InputRequired, Email, ValidationError, EqualTo, Length, URL, Optional
 
 
@@ -114,4 +114,9 @@ class EventForm(FlaskForm):
     end_time = StringField('End Time (required if End Date filled)', validators=[AlsoHasData('end_date'), Time24h()])
     location = StringField('Location')
     description = StringField('Description')
+    submit = SubmitField('Submit')
+
+
+class OrderForm(FlaskForm):
+    order = HiddenField('')
     submit = SubmitField('Submit')

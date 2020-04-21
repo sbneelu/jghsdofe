@@ -27,7 +27,7 @@
 
       <h3>Links</h3>
       <div class="mb-2">
-        <a href="{{ url_for('edit.new_link', level=level, section_id=section.id) }}" class="btn btn-primary">New Link</a> <a href="{{ url_for('edit.new_file', level=level, section_id=section.id) }}" class="btn btn-primary">New File</a> <a href="#" class="btn btn-primary">Change Order</a>
+        <a href="{{ url_for('edit.new_link', level=level, section_id=section.id) }}" class="btn btn-primary">New Link</a> <a href="{{ url_for('edit.new_file', level=level, section_id=section.id) }}" class="btn btn-primary">New File</a> <a href="{{ url_for('edit.order_links', level=level, id=section.id) }}" class="btn btn-primary">Change Order</a>
       </div>
       <ul>
         {% for link in links %}
