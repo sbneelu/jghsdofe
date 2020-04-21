@@ -3,7 +3,13 @@
 
 {% set list_of_months = ['', 'January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] %}
 {% set list_of_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
-
+<div class="row mb-2">
+  <div class="col-sm-2 col-md-2"><a href="{{ url_for('main.index', level=level) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+  <div class="col-sm-8 col-md-8">
+    <h1 class="text-center">{{ level.capitalize() }}</h1>
+  </div>
+  <div class="col-sm-2 col-md-2"></div>
+</div>
 <div class="row full-height">
   <div class="col-sm-12 col-md-12 links-and-docs">
     <a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary">Links and Documents</a>
