@@ -47,8 +47,35 @@
         {{ form.submit(class="btn btn-primary") }}
       </div>
     </form>
+    <div class="text-center">
+      <div class="uploading content-section hidden">
+        <img src="{{ url_for('static', filename='assets/spinner.gif') }}" alt="Loading spinner"> <span>Uploading... Please wait</span>
+      </div>
+    </div>
   </div>
 
 
 
 {% endblock content %}
+
+{% block head %}
+  <style>
+    .uploading {
+      display: inline-block;
+      font-size: 2em;
+      font-weight: 700;
+    }
+
+    .uploading img {
+      max-width: 30%;
+    }
+  </style>
+{% endblock head %}
+
+{% block body %}
+  <script>
+    $('form').on('submit', function() {
+      $('.uploading').removeClass('hidden');
+    });
+  </script>
+{% endblock body %}
