@@ -42,27 +42,27 @@
           <div class="form-group">
             {{ form.start_date.label(class="form-control-label") }}
             {% if form.start_date.errors %}
-              {{ form.start_date(class="form-control form-control-lg is-invalid") }}
+              {{ form.start_date(class="form-control form-control-lg datepicker is-invalid", placeholder="dd/mm/yyyy") }}
               <div class="invalid-feedback">
                 {% for error in form.start_date.errors %}
                   <span>{{ error }}</span>
                 {% endfor %}
               </div>
             {% else %}
-              {{ form.start_date(class="form-control form-control-lg") }}
+              {{ form.start_date(class="form-control form-control-lg datepicker", placeholder="dd/mm/yyyy") }}
             {% endif %}
           </div>
           <div class="form-group">
             {{ form.start_time.label(class="form-control-label") }}
             {% if form.start_time.errors %}
-              {{ form.start_time(class="form-control form-control-lg is-invalid") }}
+              {{ form.start_time(class="form-control form-control-lg timepicker is-invalid", placeholder="HH:MM") }}
               <div class="invalid-feedback">
                 {% for error in form.start_time.errors %}
                   <span>{{ error }}</span>
                 {% endfor %}
               </div>
             {% else %}
-              {{ form.start_time(class="form-control form-control-lg") }}
+              {{ form.start_time(class="form-control form-control-lg timepicker", placeholder="HH:MM") }}
             {% endif %}
           </div>
         </div>
@@ -71,27 +71,27 @@
           <div class="form-group">
             {{ form.end_date.label(class="form-control-label") }}
             {% if form.end_date.errors %}
-              {{ form.end_date(class="form-control form-control-lg is-invalid") }}
+              {{ form.end_date(class="form-control form-control-lg datepicker is-invalid", placeholder="dd/mm/yyyy") }}
               <div class="invalid-feedback">
                 {% for error in form.end_date.errors %}
                   <span>{{ error }}</span>
                 {% endfor %}
               </div>
             {% else %}
-              {{ form.end_date(class="form-control form-control-lg") }}
+              {{ form.end_date(class="form-control form-control-lg datepicker", placeholder="dd/mm/yyyy") }}
             {% endif %}
           </div>
           <div class="form-group">
             {{ form.end_time.label(class="form-control-label") }}
             {% if form.end_time.errors %}
-              {{ form.end_time(class="form-control form-control-lg is-invalid") }}
+              {{ form.end_time(class="form-control form-control-lg timepicker is-invalid", placeholder="HH:MM") }}
               <div class="invalid-feedback">
                 {% for error in form.end_time.errors %}
                   <span>{{ error }}</span>
                 {% endfor %}
               </div>
             {% else %}
-              {{ form.end_time(class="form-control form-control-lg") }}
+              {{ form.end_time(class="form-control form-control-lg timepicker", placeholder="HH:MM") }}
             {% endif %}
           </div>
         </div>
@@ -144,3 +144,30 @@
 
 
 {% endblock content %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/bootstrap-datepicker3.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/jquery.timepicker.min.css') }}">
+{% endblock head %}
+
+{% block body %}
+  <script src="{{ url_for('static', filename='scripts/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/jquery.timepicker.min.js') }}"></script>
+  <script>
+    $('.datepicker').datepicker({
+      format: 'dd/mm/yyyy'
+    });
+
+    $(document).ready(function(){
+      $('.datepicker').datepicker({
+        format: 'dd/mm/yyyy'
+      });
+
+      $('.timepicker').timepicker({
+        timeFormat: 'HH:mm',
+        dropdown: true,
+        interval: 15
+      });
+    });
+  </script>
+{% endblock body %}
