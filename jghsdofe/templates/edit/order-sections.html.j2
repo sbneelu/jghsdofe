@@ -10,23 +10,47 @@
   </div>
   <div class="content-section">
     <div style="font-size: 1.5em;">
-      <ul>
-        {% for section in sections %}
-          <li>{{ section.title }}</li>
-        {% endfor %}
-      </ul>
-      <form action="" method="post" novalidate="novalidate">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-          <a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary">Cancel</a>
-          {{ form.submit(class="btn btn-primary") }}
+      {% if sections | length == 0 %}
+        <p>There are no links sections. Click "Go back" to go back to the links page to add sections.</p>
+        <a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary">Go back</a>
+      {% else %}
+        <div id="cancel-move" class="hidden mb-3 mt-3">
+          <div>Moving <b><span class="move-name"></span></b></div>
+          <a href="#" class="btn btn-primary" onclick="cancelMove();">Cancel move (move a different section)</a>
         </div>
-      </form>
+
+        <ul class="moveable-ul">
+          <li class="move hidden" data-order="0">
+            <a href="#" class="btn btn-primary move-btn" data-order="0" onclick="move(0);">Move here</a>
+          </li>
+          {% for section in sections %}
+            <li class="moveable" data-id="{{ section.id }}">
+              <span data-id="{{ section.id }}" class="moveable-title">{{ section.title }}</a>
+              <a href="#" class="btn btn-primary moveable-btn" data-id="{{ section.id }}" onclick="moveable('{{ section.id }}')">Move</a>
+            </li>
+            <li class="move hidden" data-order="{{ loop.index }}">
+              <a href="#" class="btn btn-primary move-btn" data-order="{{ loop.index }}" onclick="move({{ loop.index }});">Move here</a>
+            </li>
+          {% endfor %}
+        </ul>
+        <form action="" method="post" novalidate="novalidate">
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            <a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary">Cancel</a>
+            {{ form.submit(class="btn btn-primary") }}
+          </div>
+        </form>
+      {% endif %}
     </div>
 
 
   </div>
+  <div id="mid" class="hidden"></div>
 
 
 
 {% endblock content %}
+
+{% block body %}
+  <script src="{{ url_for('static', filename='scripts/moveable.js') }}"></script>
+{% endblock body %}

@@ -16,19 +16,31 @@
           {{ section.description }}
         {% endif %}
       </div>
-      <div class="mb-2">
-      </div>
       {% if links | length == 0 %}
         <p>There are no links in this section. Click "Go back" to go back to the edit page to add links.</p>
         <a href="{{ url_for('edit.edit_section', level=level, id=section.id) }}" class="btn btn-primary">Go back</a>
       {% else %}
-        <ul>
+        <div id="cancel-move" class="hidden mb-3 mt-3">
+          <div>Moving <b><span class="move-name"></span></b></div>
+          <a href="#" class="btn btn-primary" onclick="cancelMove();">Cancel move (move a different link)</a>
+        </div>
+        <ul class="moveable-ul">
+          <li class="move hidden" data-order="0">
+            <a href="#" class="btn btn-primary move-btn" data-order="0" onclick="move(0);">Move here</a>
+          </li>
           {% for link in links %}
-            <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a> [{% if link.is_doc %}File{% else %}Link{% endif %}]</li>
+            <li class="moveable" data-id="{{ link.id }}">
+              <a target="_blank" href="{{ link.url }}" data-id="{{ link.id }}" class="moveable-title">{{ link.title }}</a> [{% if link.is_doc %}File{% else %}Link{% endif %}]
+              <a href="#" class="btn btn-primary moveable-btn" data-id="{{ link.id }}" onclick="moveable('{{ link.id }}')">Move</a>
+            </li>
+            <li class="move hidden" data-order="{{ loop.index }}">
+              <a href="#" class="btn btn-primary move-btn" data-order="{{ loop.index }}" onclick="move({{ loop.index }});">Move here</a>
+            </li>
           {% endfor %}
         </ul>
         <form action="" method="post" novalidate="novalidate">
           {{ form.hidden_tag() }}
+
           <div class="form-group">
             <a href="{{ url_for('edit.edit_section', level=level, id=section.id) }}" class="btn btn-primary">Cancel</a>
             {{ form.submit(class="btn btn-primary") }}
@@ -37,6 +49,7 @@
       {% endif %}
 
     </div>
+    <div id="mid" class="hidden"></div>
 
 
   </div>
@@ -44,3 +57,7 @@
 
 
 {% endblock content %}
+
+{% block body %}
+  <script src="{{ url_for('static', filename='scripts/moveable.js') }}"></script>
+{% endblock body %}
