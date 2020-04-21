@@ -14,70 +14,6 @@
   <div class="col-sm-12 col-md-12 links-and-docs">
     <a href="{{ url_for('view.links', level=level) }}" class="btn btn-primary">Links and Documents</a>
   </div>
-  <div class="col-sm-12 col-md-6 container announcements">
-    <div class="content-section">
-      <h2 class="text-center">Recent Announcements</h2>
-      <div>
-        {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
-        <div class="row" style="width: 100%; margin:auto; margin-top: 1em; margin-bottom: 1.5em;">
-          <a href="{{ url_for('view.announcements', level=level) }}" class="btn btn-primary col-xs-12">Create/Edit Announcements</a>
-        </div>
-
-        {% if starred_announcements|length == 0 and unstarred_announcements|length == 0 %}
-          <div class="text-center">
-            No starred or recent announcements.
-          </div>
-          <br>
-        {% endif %}
-        {% for announcement in starred_announcements %}
-          <div class="announcement starred-announcement content-section">
-            <div class="starred"><span class="star">&#x2605;</span> Starred</div>
-            <p>{{ announcement.content }}</p>
-            <i>
-
-              {% set date_posted_hour = announcement.date_posted.hour|string if announcement.date_posted.hour > 10 else '0' + announcement.date_posted.hour|string %}
-              {% set date_posted_minute = announcement.date_posted.minute|string if announcement.date_posted.minute > 10 else '0' + announcement.date_posted.minute|string %}
-
-
-              {% if announcement.edited %}
-              {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
-              {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
-                Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
-                <br>
-                First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
-              {% else %}
-                Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
-              {% endif %}
-            </i>
-          </div>
-        {% endfor %}
-        {% for announcement in unstarred_announcements %}
-          <div class="announcement content-section">
-            <p>{{ announcement.content }}</p>
-            <i>
-
-              {% set date_posted_hour = announcement.date_posted.hour|string if announcement.date_posted.hour > 10 else '0' + announcement.date_posted.hour|string %}
-              {% set date_posted_minute = announcement.date_posted.minute|string if announcement.date_posted.minute > 10 else '0' + announcement.date_posted.minute|string %}
-
-              {% if announcement.edited %}
-              {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
-              {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
-                Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
-                <br>
-                First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
-              {% else %}
-                Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
-              {% endif %}
-            </i>
-          </div>
-        {% endfor %}
-      </div>
-      <div class="text-right">
-        <a href="{{ url_for('view.announcements', level=level) }}">View older announcements...</a>
-      </div>
-
-    </div>
-  </div>
   <div class="col-sm-12 col-md-6 container events">
     <div class="content-section">
       <h2 class="text-center">Upcoming Events</h2>
@@ -200,6 +136,70 @@
       <div class="text-right">
         <a href="{{ url_for('view.calendar', level=level) }}">View full calendar...</a>
       </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-6 container announcements">
+    <div class="content-section">
+      <h2 class="text-center">Recent Announcements</h2>
+      <div>
+        {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+        <div class="row" style="width: 100%; margin:auto; margin-top: 1em; margin-bottom: 1.5em;">
+          <a href="{{ url_for('view.announcements', level=level) }}" class="btn btn-primary col-xs-12">Create/Edit Announcements</a>
+        </div>
+
+        {% if starred_announcements|length == 0 and unstarred_announcements|length == 0 %}
+          <div class="text-center">
+            No starred or recent announcements.
+          </div>
+          <br>
+        {% endif %}
+        {% for announcement in starred_announcements %}
+          <div class="announcement starred-announcement content-section">
+            <div class="starred"><span class="star">&#x2605;</span> Starred</div>
+            <p>{{ announcement.content }}</p>
+            <i>
+
+              {% set date_posted_hour = announcement.date_posted.hour|string if announcement.date_posted.hour > 10 else '0' + announcement.date_posted.hour|string %}
+              {% set date_posted_minute = announcement.date_posted.minute|string if announcement.date_posted.minute > 10 else '0' + announcement.date_posted.minute|string %}
+
+
+              {% if announcement.edited %}
+              {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
+              {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
+                Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
+                <br>
+                First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+              {% else %}
+                Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+              {% endif %}
+            </i>
+          </div>
+        {% endfor %}
+        {% for announcement in unstarred_announcements %}
+          <div class="announcement content-section">
+            <p>{{ announcement.content }}</p>
+            <i>
+
+              {% set date_posted_hour = announcement.date_posted.hour|string if announcement.date_posted.hour > 10 else '0' + announcement.date_posted.hour|string %}
+              {% set date_posted_minute = announcement.date_posted.minute|string if announcement.date_posted.minute > 10 else '0' + announcement.date_posted.minute|string %}
+
+              {% if announcement.edited %}
+              {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
+              {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
+                Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
+                <br>
+                First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+              {% else %}
+                Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
+              {% endif %}
+            </i>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="text-right">
+        <a href="{{ url_for('view.announcements', level=level) }}">View older announcements...</a>
+      </div>
+
     </div>
   </div>
 </div>
