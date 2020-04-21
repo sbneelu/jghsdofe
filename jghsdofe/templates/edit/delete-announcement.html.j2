@@ -27,11 +27,11 @@
         {% if announcement.edited %}
         {% set date_edited_hour = announcement.date_edited.hour|string if announcement.date_edited.hour > 10 else '0' + announcement.date_edited.hour|string %}
         {% set date_edited_minute = announcement.date_edited.minute|string if announcement.date_edited.minute > 10 else '0' + announcement.date_edited.minute|string %}
-          Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }} at {{ date_edited_hour }}:{{ date_edited_minute }}
+          Last edited on {{ days_of_week[announcement.date_edited.weekday()] }} {{ announcement.date_edited.day }}/{{ announcement.date_edited.month }}/{{ announcement.date_edited.year }}
           <br>
-          First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }} at {{ date_posted_hour }}:{{ date_posted_minute }}
+          First posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }}
         {% else %}
-          Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }} at {{ date_posted_hour }}:{{ date_posted_minute }}
+          Posted on {{ days_of_week[announcement.date_posted.weekday()] }} {{ announcement.date_posted.day }}/{{ announcement.date_posted.month }}/{{ announcement.date_posted.year }} 
         {% endif %}
       </i>
     </div>
