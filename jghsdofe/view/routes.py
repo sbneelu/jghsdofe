@@ -59,10 +59,13 @@ def announcements(level):
 def links(level):
     if level not in ['bronze', 'silver', 'gold']:
         abort(404)
+
     sections = Section.query.filter(Section.level == level).all()
     sections.sort(key=lambda s: s.order)
 
-    links = Link.query.filter(Section.level == level).all()
+    section_ids = [section.id for section in sections]
+
+    links = Link.query.filter(Link.section_id.in_(section_ids)).all()
     links.sort(key=lambda l: l.order)
 
     links_sorted = {}
