@@ -13,23 +13,179 @@
       No links or documents.
     </div>
   {% endif %}
-  <div class="row">
-    {% for section in sections %}
-    {% set links = links_sorted[section.id] %}
-      <div class="container col-sm-12 col-md-6 col-lg-4">
-        <div class="content-section">
-          <h3>{{ section.title }}</h3>
-          {% if section.description %}
-            <p>{{ section.description }}</p>
-          {% endif %}
-          <ul>
-            {% for link in links %}
-              <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
-            {% endfor %}
-          </ul>
+  <div class="one-in-a-row row">
+    <div class="c col-xs-12">
+      {% for section in sections %}
+        {% set links = links_sorted[section.id] %}
+        <div class="container section">
+          <div class="content-section">
+            <h3>{{ section.title }}</h3>
+            {% if section.description %}
+              <p>{{ section.description }}</p>
+            {% endif %}
+            <ul>
+              {% for link in links %}
+                <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
   </div>
 
+  <div class="two-in-a-row row">
+    <div class="c col-xs-6">
+      {% for section in sections %}
+        {% if loop.index % 2 == 1 %}
+          {% set links = links_sorted[section.id] %}
+          <div class="container section">
+            <div class="content-section">
+              <h3>{{ section.title }}</h3>
+              {% if section.description %}
+                <p>{{ section.description }}</p>
+              {% endif %}
+              <ul>
+                {% for link in links %}
+                  <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="c col-xs-6">
+      {% for section in sections %}
+        {% if loop.index % 2 == 0 %}
+          {% set links = links_sorted[section.id] %}
+          <div class="container section">
+            <div class="content-section">
+              <h3>{{ section.title }}</h3>
+              {% if section.description %}
+                <p>{{ section.description }}</p>
+              {% endif %}
+              <ul>
+                {% for link in links %}
+                  <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="three-in-a-row row">
+    <div class="c col-xs-4">
+      {% for section in sections %}
+        {% if loop.index % 3 == 1 %}
+          {% set links = links_sorted[section.id] %}
+          <div class="container section">
+            <div class="content-section">
+              <h3>{{ section.title }}</h3>
+              {% if section.description %}
+                <p>{{ section.description }}</p>
+              {% endif %}
+              <ul>
+                {% for link in links %}
+                  <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="c col-xs-4">
+      {% for section in sections %}
+        {% if loop.index % 3 == 2 %}
+          {% set links = links_sorted[section.id] %}
+          <div class="container section">
+            <div class="content-section">
+              <h3>{{ section.title }}</h3>
+              {% if section.description %}
+                <p>{{ section.description }}</p>
+              {% endif %}
+              <ul>
+                {% for link in links %}
+                  <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="c col-xs-4">
+      {% for section in sections %}
+        {% if loop.index % 3 == 0 %}
+          {% set links = links_sorted[section.id] %}
+          <div class="container section">
+            <div class="content-section">
+              <h3>{{ section.title }}</h3>
+              {% if section.description %}
+                <p>{{ section.description }}</p>
+              {% endif %}
+              <ul>
+                {% for link in links %}
+                  <li><a target="_blank" href="{{ link.url }}">{{ link.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+
 {% endblock content %}
+
+{% block head %}
+  <style>
+    .c {
+      margin: 0 !important;
+      padding: 0 !important;
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .two-in-a-row, .three-in-a-row {
+      display: none;
+    }
+
+    .section {
+      display: block;
+      width: 100%;
+      margin: 0 !important;
+    }
+
+    @media (min-width: 576px) {
+      .one-in-a-row {
+        display: none;
+      }
+      .two-in-a-row {
+        display: block;
+      }
+      .three-in-a-row {
+        display: none;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .one-in-a-row {
+        display: none;
+      }
+      .two-in-a-row {
+        display: none;
+      }
+      .three-in-a-row {
+        display: block;
+      }
+    }
+
+  </style>
+
+{% endblock head %}
