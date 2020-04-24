@@ -1,8 +1,8 @@
 from flask import abort, render_template, url_for, redirect, flash, request, Blueprint, current_app
 from flask_login import current_user, login_required
-from jghsdofe.models import Announcement, Section, Link, Event
+from jghsdofe.models import Announcement, Section, Link, Event, User
 from jghsdofe import db
-from jghsdofe.edit.forms import AnnouncementForm, SectionDetailsForm, LinkDetailsForm, FileDetailsForm, EditFileDetailsForm, EventForm, OrderForm
+from jghsdofe.edit.forms import AnnouncementForm, SectionDetailsForm, LinkDetailsForm, FileDetailsForm, EditFileDetailsForm, EventForm, OrderForm, AdminUsernameForm
 import datetime
 import os
 from werkzeug import secure_filename
@@ -523,3 +523,176 @@ def order_sections(level):
 
     flash('You are not authorised to edit sections for this level.', 'danger')
     return redirect(url_for('view.links', level=level))
+
+
+@edit.route('/admin', methods=['GET', 'POST'])
+@login_required
+def admin_panel():
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        form = AdminUsernameForm()
+        if form.validate_on_submit():
+            return redirect(url_for('edit.admin_view_permissions', username=form.username.data, title='Admin Panel'))
+        return render_template('edit/admin-panel.html.j2', form=form, title='Admin Panel')
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>', methods=['GET', 'POST'])
+@login_required
+def admin_view_permissions(username):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        return render_template('edit/admin-view-permissions.html.j2', user=user, title='Admin Panel')
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>/grant/<string:level>', methods=['GET', 'POST'])
+@login_required
+def admin_grant_level_access(username, level):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        if level not in ['bronze', 'silver', 'gold']:
+            abort(404)
+        if getattr(user, level + '_access'):
+            flash('This user already has editing access to this section.', 'danger')
+            return redirect(url_for('edit.admin_view_permissions', username=username))
+        return render_template('edit/admin-grant-level-access.html.j2', user=user, level=level, title='Admin Panel')
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>/grant/<string:level>/confirm', methods=['GET', 'POST'])
+@login_required
+def admin_confirm_grant_level_access(username, level):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        if level not in ['bronze', 'silver', 'gold']:
+            abort(404)
+        if getattr(user, level + '_access'):
+            flash('This user already has editing access to this section.', 'danger')
+            return redirect(url_for('edit.admin_view_permissions', username=username))
+        setattr(user, level + '_access', True)
+        db.session.commit()
+        flash('User <b>' + username + '</b> has been granted access to edit the <b>' + level.capitalize() + '</b> section.', 'success')
+        return redirect(url_for('edit.admin_view_permissions', username=username))
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>/revoke/<string:level>', methods=['GET', 'POST'])
+@login_required
+def admin_revoke_level_access(username, level):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        if level not in ['bronze', 'silver', 'gold']:
+            abort(404)
+        if not getattr(user, level + '_access'):
+            flash('This user does not have editing access to this section.', 'danger')
+            return redirect(url_for('edit.admin_view_permissions', username=username))
+        return render_template('edit/admin-revoke-level-access.html.j2', user=user, level=level, title='Admin Panel')
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>/revoke/<string:level>/confirm', methods=['GET', 'POST'])
+@login_required
+def admin_confirm_revoke_level_access(username, level):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        if level not in ['bronze', 'silver', 'gold']:
+            abort(404)
+        if not getattr(user, level + '_access'):
+            flash('This user does not have editing access to this section.', 'danger')
+            return redirect(url_for('edit.admin_view_permissions', username=username))
+        setattr(user, level + '_access', False)
+        db.session.commit()
+        flash('User <b>' + username + '</b>\'s access to edit the <b>' + level.capitalize() + '</b> section has been revoked.', 'success')
+        return redirect(url_for('edit.admin_view_permissions', username=username))
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>/admin/grant', methods=['GET', 'POST'])
+@login_required
+def admin_grant_admin_access(username):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        if getattr(user, 'is_admin'):
+            flash('This user is already an administrator.', 'danger')
+            return redirect(url_for('edit.admin_view_permissions', username=username))
+        return render_template('edit/admin-grant-admin-access.html.j2', user=user, title='Admin Panel')
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>/admin/grant/confirm', methods=['GET', 'POST'])
+@login_required
+def admin_confirm_grant_admin_access(username):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        if getattr(user, 'is_admin'):
+            flash('This user is already an administrator.', 'danger')
+            return redirect(url_for('edit.admin_view_permissions', username=username))
+        setattr(user, 'is_admin', True)
+        db.session.commit()
+        flash('User <b>' + username + '</b> has been granted administrator access to the website.', 'success')
+        return redirect(url_for('edit.admin_view_permissions', username=username))
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>/admin/revoke', methods=['GET', 'POST'])
+@login_required
+def admin_revoke_admin_access(username):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        if not getattr(user, 'is_admin'):
+            flash('This user is not an administrator.', 'danger')
+            return redirect(url_for('edit.admin_view_permissions', username=username))
+        return render_template('edit/admin-revoke-admin-access.html.j2', user=user, title='Admin Panel')
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+@edit.route('/admin/<string:username>/admin/revoke/confirm', methods=['GET', 'POST'])
+@login_required
+def admin_confirm_revoke_admin_access(username):
+    if current_user.is_authenticated and getattr(current_user, 'is_admin'):
+        user = User.query.filter_by(username=username).first()
+        if not user:
+            flash('User not found. Please check the username and try again.', 'danger')
+            return redirect(url_for('edit.admin_panel'))
+        if not getattr(user, 'is_admin'):
+            flash('This user is not an administrator.', 'danger')
+            return redirect(url_for('edit.admin_view_permissions', username=username))
+        setattr(user, 'is_admin', False)
+        db.session.commit()
+        flash('User <b>' + username + '</b>\'s administrator access to the website has been revoked.', 'success')
+        return redirect(url_for('edit.admin_view_permissions', username=username))
+    flash('You are not an administrator. Please request access to the admin panel.', 'danger')
+    return redirect(url_for('main.index'))

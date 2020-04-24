@@ -50,6 +50,7 @@ class User(db.Model, UserMixin):
     gold_access = db.Column(db.Boolean, nullable=False, default=False)
     silver_access = db.Column(db.Boolean, nullable=False, default=False)
     bronze_access = db.Column(db.Boolean, nullable=False, default=False)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return f"User('{self.username}')"

@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FileField, DateField, HiddenField
 from wtforms.validators import InputRequired, Email, ValidationError, EqualTo, Length, URL, Optional
+from jghsdofe.models import User
 
 
 class AlsoHasData(object):
@@ -120,3 +121,13 @@ class EventForm(FlaskForm):
 class OrderForm(FlaskForm):
     order = HiddenField('')
     submit = SubmitField('Submit')
+
+
+class AdminUsernameForm(FlaskForm):
+    username = StringField('Username', validators=[InputRequired()])
+    submit = SubmitField('Submit')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if not user:
+            raise ValidationError('User not found. Please check the username and try again.')

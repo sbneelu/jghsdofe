@@ -1,0 +1,61 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('edit.admin_panel') }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8 text-center">
+      <h1>Admin Panel</h1>
+      <p>View and edit the editing privileges of user <b>{{ user.username }}</b>.</p>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+  <div class="content-section" style="font-size: 2em;">
+    <div class="mb-2">
+      <b>Username:</b> {{user.username}}
+    </div>
+    <div class="mb-2">
+      <b>Administrator Access:</b>
+      {% if user.is_admin %}
+        <span class="text-success">Yes</span>
+        {% if user == current_user %}
+           <small>(You can not revoke your own administrator access. Please ask another administrator to do this if required.)</small>
+        {% else %}
+          <a href="{{ url_for('edit.admin_revoke_admin_access', username=user.username) }}" class="btn btn-primary">Revoke admin permission</a>
+        {% endif %}
+      {% else %}
+        <span class="text-danger">No</span>
+        <a href="{{ url_for('edit.admin_grant_admin_access', username=user.username) }}" class="btn btn-primary">Make admin</a>
+      {% endif %}
+    </div>
+    <div class="mb-2">
+      <b>Bronze Editing Access:</b>
+      {% if user.bronze_access %}
+        <span class="text-success">Yes</span> <a href="{{ url_for('edit.admin_revoke_level_access', username=user.username, level='bronze') }}" class="btn btn-primary">Revoke permission</a>
+      {% else %}
+        <span class="text-danger">No</span> <a href="{{ url_for('edit.admin_grant_level_access', username=user.username, level='bronze') }}" class="btn btn-primary">Grant permission</a>
+      {% endif %}
+    </div>
+    <div class="mb-2">
+      <b>Silver Editing Access:</b>
+      {% if user.silver_access %}
+        <span class="text-success">Yes</span> <a href="{{ url_for('edit.admin_revoke_level_access', username=user.username, level='silver') }}" class="btn btn-primary">Revoke permission</a>
+      {% else %}
+        <span class="text-danger">No</span> <a href="{{ url_for('edit.admin_grant_level_access', username=user.username, level='silver') }}" class="btn btn-primary">Grant permission</a>
+      {% endif %}
+    </div>
+    <div class="mb-2">
+      <b>Gold Editing Access:</b>
+      {% if user.gold_access %}
+        <span class="text-success">Yes</span> <a href="{{ url_for('edit.admin_revoke_level_access', username=user.username, level='gold') }}" class="btn btn-primary">Revoke permission</a>
+      {% else %}
+        <span class="text-danger">No</span> <a href="{{ url_for('edit.admin_grant_level_access', username=user.username, level='gold') }}" class="btn btn-primary">Grant permission</a>
+      {% endif %}
+    </div>
+
+    <a href="{{ url_for('edit.admin_panel') }}" class="btn btn-primary">Cancel</a>
+
+  </div>
+
+
+
+{% endblock content %}

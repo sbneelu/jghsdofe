@@ -1,0 +1,16 @@
+{% extends 'layout.html.j2' %}
+{% block content %}
+  {% set days_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+  <div class="row">
+    <div class="col-sm-2 col-md-2"><a href="{{ url_for('edit.admin_view_permissions', username=user.username) }}" class="btn btn-primary"><h4>&larr; Back</h4></a></div>
+    <div class="col-sm-8 col-md-8 text-center">
+      <h1>Admin Panel</h1>
+    </div>
+    <div class="col-sm-2 col-md-2"></div>
+  </div>
+  <div class="content-section" style="font-size: 2em;">
+    <p class="text-center">Are you sure you would like to revoke <b>{{ user.username }}</b>'s editing access to the <b>{{ level.capitalize() }}</b> section? They will no longer be able to edit <b>any aspect</b> of this section of the website. Their editing permissions for any other levels will be unaffected.</p>
+    <a href="{{ url_for('edit.admin_view_permissions', username=user.username) }}" class="btn btn-primary">Cancel</a> <a href="{{ url_for('edit.admin_confirm_revoke_level_access', username=user.username, level=level) }}" class="btn btn-primary">Revoke Permission</a>
+
+  </div>
+{% endblock content %}

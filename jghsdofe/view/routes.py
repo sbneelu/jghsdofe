@@ -121,6 +121,8 @@ def calendar(level):
 
 @view.route('/<string:level>/calendar/<int:id>')
 def event(level, id):
+    if level not in ['bronze', 'silver', 'gold']:
+        abort(404)
     event = Event.query.get(id)
     if not event:
         flash('Invalid event.', 'danger')
