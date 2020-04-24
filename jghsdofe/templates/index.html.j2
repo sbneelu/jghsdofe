@@ -6,7 +6,7 @@
   <div class="container m-2">
     {% if current_user.is_authenticated %}
       {% if current_user.is_admin %}
-        <div class="alert alert-info">Go to the admin panel and input your username (<b>{{ current_user.username }}</b>) to give yourself editing access to sections of the website.</div>
+        <div class="alert alert-info">Go to the <a href="{{ url_for('edit.admin_panel') }}" class="alert-link">admin panel</a> and input your username (<b>{{ current_user.username }}</b>) to give yourself editing access to sections of the website.</div>
       {% else %}
         <div class="alert alert-info">Contact a website administrator and give them your username (<b>{{ current_user.username }}</b>) to request editing access to sections of the website.</div>
       {% endif%}
