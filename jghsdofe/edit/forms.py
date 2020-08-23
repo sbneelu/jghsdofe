@@ -128,6 +128,6 @@ class AdminUsernameForm(FlaskForm):
     submit = SubmitField('Submit')
 
     def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
+        user = User.query.filter_by(username=username.data.lower()).first()
         if not user:
             raise ValidationError('User not found. Please check the username and try again.')

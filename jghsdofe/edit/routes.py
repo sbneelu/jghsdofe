@@ -179,7 +179,6 @@ def confirm_delete_section(level, id):
         return redirect(url_for('view.links', level=level))
     if current_user.is_authenticated and getattr(current_user, level + '_access') and section.level == level:
         section = Section.query.get(id)
-        db.session.delete(section)
         links = Link.query.filter_by(section_id=id)
         for link in links:
             if link.is_doc:
@@ -187,6 +186,7 @@ def confirm_delete_section(level, id):
                 filename = ''.join(url[3:])
                 os.remove(os.path.join(current_app.root_path, 'files', level, filename))
             db.session.delete(link)
+        db.session.delete(section)
         db.session.commit()
     return redirect(url_for('view.links', level=level))
 
@@ -531,7 +531,7 @@ def admin_panel():
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         form = AdminUsernameForm()
         if form.validate_on_submit():
-            return redirect(url_for('edit.admin_view_permissions', username=form.username.data, title='Admin Panel'))
+            return redirect(url_for('edit.admin_view_permissions', username=form.username.data.lower()))
         return render_template('edit/admin-panel.html.j2', form=form, title='Admin Panel')
     flash('You are not an administrator. Please request access to the admin panel.', 'danger')
     return redirect(url_for('main.index'))
@@ -540,6 +540,7 @@ def admin_panel():
 @edit.route('/admin/<string:username>', methods=['GET', 'POST'])
 @login_required
 def admin_view_permissions(username):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -553,6 +554,7 @@ def admin_view_permissions(username):
 @edit.route('/admin/<string:username>/grant/<string:level>', methods=['GET', 'POST'])
 @login_required
 def admin_grant_level_access(username, level):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -571,6 +573,7 @@ def admin_grant_level_access(username, level):
 @edit.route('/admin/<string:username>/grant/<string:level>/confirm', methods=['GET', 'POST'])
 @login_required
 def admin_confirm_grant_level_access(username, level):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -592,6 +595,7 @@ def admin_confirm_grant_level_access(username, level):
 @edit.route('/admin/<string:username>/revoke/<string:level>', methods=['GET', 'POST'])
 @login_required
 def admin_revoke_level_access(username, level):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -610,6 +614,7 @@ def admin_revoke_level_access(username, level):
 @edit.route('/admin/<string:username>/revoke/<string:level>/confirm', methods=['GET', 'POST'])
 @login_required
 def admin_confirm_revoke_level_access(username, level):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -631,6 +636,7 @@ def admin_confirm_revoke_level_access(username, level):
 @edit.route('/admin/<string:username>/admin/grant', methods=['GET', 'POST'])
 @login_required
 def admin_grant_admin_access(username):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -647,6 +653,7 @@ def admin_grant_admin_access(username):
 @edit.route('/admin/<string:username>/admin/grant/confirm', methods=['GET', 'POST'])
 @login_required
 def admin_confirm_grant_admin_access(username):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -666,6 +673,7 @@ def admin_confirm_grant_admin_access(username):
 @edit.route('/admin/<string:username>/admin/revoke', methods=['GET', 'POST'])
 @login_required
 def admin_revoke_admin_access(username):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
@@ -682,6 +690,7 @@ def admin_revoke_admin_access(username):
 @edit.route('/admin/<string:username>/admin/revoke/confirm', methods=['GET', 'POST'])
 @login_required
 def admin_confirm_revoke_admin_access(username):
+    username = username.lower()
     if current_user.is_authenticated and getattr(current_user, 'is_admin'):
         user = User.query.filter_by(username=username).first()
         if not user:
